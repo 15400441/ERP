@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		">
+	<!-- 设置具体开始哪些任务 -->
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<!-- 指定具体的哪些任务开始执行 -->
+		<property name="triggers">
+			<list>
+				<ref bean="doTime"/>
+				<ref bean="doTime2"/>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 指定对应任务的执行时间 -->	
+	<bean id="doTime" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<!-- 指定具体的任务的执行时间 -->
+		<!-- 任务对象 -->
+		<property name="jobDetail" ref="jobTask"/>
+		<!-- 执行时间 -->
+		<property name="cronExpression" value="0 0 2 * * ?"/>
+	</bean>
+	<bean id="doTime2" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<!-- 指定具体的任务的执行时间 -->
+		<!-- 任务对象 -->
+		<property name="jobDetail" ref="jobTask2"/>
+		<!-- 执行时间 -->
+		<property name="cronExpression" value="0 0/30 9-11,13-16 * * ?"/>
+	</bean>
+		
+	<!-- 指定对应bean中哪个操作是定时执行的任务 -->
+	<bean id="jobTask" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<!-- 指定某个类中的某个方法为具体的任务 -->
+		<property name="targetObject" ref="timeTask"/>
+		<property name="targetMethod" value="goodsUseNumUpdate"/>
+	</bean>
+	<bean id="jobTask2" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<!-- 指定某个类中的某个方法为具体的任务 -->
+		<property name="targetObject" ref="timeTask"/>
+		<property name="targetMethod" value="storeWarn"/>
+	</bean>
+	
+	<!-- 将定时任务对应的类的对象配置为Spring可以控制的Bean -->
+	<bean id="timeTask" class="cn.itcast.erp.util.quartz.TimerTask">
+		<property name="goodsEbi" ref="goodsEbi"/>
+		<property name="mailSender" ref="mailSender"/>
+	</bean>
+</beans>
+
+
+
+
+
+
+
